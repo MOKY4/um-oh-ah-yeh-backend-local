@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flask-SocketIO Chatbot</title>
+    <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+</head>
+<body>
+    <div id="chat">
+        <form action="">
+            <input id="message_input" autocomplete="off" />
+            <button>Send</button>
+        </form>
+        <ul id="messages"></ul>
+    </div>
+    <script>
+
+        $(document).ready(function() {
+            var socket = io.connect('http://127.0.0.1:5000');
+
+            //프라이빗 룸 입장 요청
+            let roomName = ""
+            socket.on("enter_room", (room_name) => {
+                roomName = room_name
+            });
+
+            $('form').submit(function(e) {
+                e.preventDefault();
+                var message = $('#message_input').val();
+                socket.emit('chat', message, roomName);
+                $('#message_input').val('');
+                return false;
+            });
+
+            socket.on('chat', function(response) {
+                $('#messages').append($('<li>').text(response.message));
+            });
+        });
+    </script>
+</body>
+</html>
